@@ -37,16 +37,18 @@ See [`docs/adr/`](docs/adr/) for architectural decisions and [`CONTEXT.md`](CONT
 
 ## Local setup
 
-### 1. API
+### 1. API (Sail)
 
 ```bash
 cd api
-cp .env.example .env          # then fill in DB_* credentials
+cp .env.example .env
 composer install
-php artisan key:generate
-php artisan migrate
-php artisan serve             # http://localhost:8000
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate
 ```
+
+API: `http://localhost` (port 80).
 
 ### 2. Web
 
@@ -56,9 +58,14 @@ pnpm install
 pnpm -F web dev               # http://localhost:5173
 ```
 
+Leave `web/.env` `VITE_API_URL` empty — the Vite dev server proxies `/sanctum`, `/register`, `/api`, etc. to Sail so CSRF cookies stay on the same origin as the SPA.
+
 ## Running both together
 
-Open two terminals — one for `php artisan serve` and one for `pnpm -F web dev`. The Vue app proxies auth requests to `http://localhost:8000` via the `VITE_API_URL` env var.
+Terminal 1: `cd api && ./vendor/bin/sail up`  
+Terminal 2: `pnpm -F web dev` from the repo root.
+
+Restart the Vite dev server after changing `web/.env` or `vite.config.ts`.
 
 ## Packages
 

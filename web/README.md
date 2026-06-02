@@ -16,16 +16,20 @@ Vue 3 SPA — the browser client for the Tenuto piano practice platform.
 ```bash
 # from repo root
 pnpm install
-cp .env.example .env          # set VITE_API_URL if needed
+cp web/.env.example web/.env
 pnpm -F web dev               # http://localhost:5173
 ```
 
-The API must be running at `VITE_API_URL` (default: `http://localhost:8000`).
+With Sail, leave `VITE_API_URL` empty — `vite.config.ts` proxies auth and API routes to `http://localhost`.
 
 ## Environment variables
 
 ```dotenv
-VITE_API_URL=http://localhost:8000
+# Sail + local dev (uses Vite proxy — recommended)
+VITE_API_URL=
+
+# Direct API URL (no proxy; e.g. php artisan serve on :8000)
+# VITE_API_URL=http://localhost:8000
 ```
 
 ## Project structure

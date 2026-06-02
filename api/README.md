@@ -24,17 +24,29 @@ These are registered by Fortify/Sanctum — no custom controllers needed.
 | `POST` | `/email/verification-notification` | Resend verification email |
 | `GET` | `/api/v1/user` | Authenticated user — requires `auth:sanctum` |
 
-## Local setup
+## Local setup (Sail)
 
 ```bash
 cp .env.example .env
-# Edit .env — set DB_DATABASE, DB_USERNAME, DB_PASSWORD
+composer install
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate
+```
 
+API: `http://localhost` (port 80). Run the web app separately — see repo root `README.md`.
+
+## Local setup (without Sail)
+
+```bash
+cp .env.example .env
 composer install
 php artisan key:generate
 php artisan migrate
 php artisan serve             # http://localhost:8000
 ```
+
+Adjust `SANCTUM_STATEFUL_DOMAINS` to include `localhost:8000` and set `VITE_API_URL=http://localhost:8000` in `web/.env` (no Vite proxy).
 
 ## Key configuration
 
@@ -43,27 +55,21 @@ php artisan serve             # http://localhost:8000
 | `config/fortify.php` | `'views' => false` — headless; enabled features listed under `features` |
 | `config/sanctum.php` | Stateful domains controlled via `SANCTUM_STATEFUL_DOMAINS` in `.env` |
 | `config/cors.php` | `supports_credentials = true`; add client origins to `allowed_origins` |
-| `.env` | `SESSION_DOMAIN=localhost` for dev; `.tenuto.com` for production |
+| `.env` | `SESSION_DOMAIN=null` for Sail; `.tenuto.com` for production |
 
 ## Environment variables
 
 ```dotenv
-# Database
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=tenuto
-DB_USERNAME=postgres
-DB_PASSWORD=
-
-# Session / CORS (dev)
-SESSION_DOMAIN=localhost
-SANCTUM_STATEFUL_DOMAINS=localhost:5173,localhost:3000,localhost:8000
+# Session / CORS (Sail + Vite on :5173)
+SESSION_DOMAIN=null
+SANCTUM_STATEFUL_DOMAINS=localhost:5173,localhost:3000,localhost
 
 # Session / CORS (production)
 # SESSION_DOMAIN=.tenuto.com
 # SANCTUM_STATEFUL_DOMAINS=app.tenuto.com
 ```
+
+With Sail, leave `web/.env` `VITE_API_URL` empty so the Vite dev proxy forwards auth routes to `http://localhost` (avoids cross-origin CSRF cookie issues).
 
 ## API versioning
 

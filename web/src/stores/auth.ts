@@ -68,6 +68,11 @@ export const useAuthStore = defineStore('auth', () => {
     return api.post('/email/verification-notification')
   }
 
+  async function verifyEmail(id: string, hash: string, queryParams: Record<string, string>) {
+    await api.get(`/email/verify/${id}/${hash}`, { params: queryParams })
+    await fetchUser()
+  }
+
   return {
     user,
     initialized,
@@ -80,5 +85,6 @@ export const useAuthStore = defineStore('auth', () => {
     forgotPassword,
     resetPassword,
     resendVerificationEmail,
+    verifyEmail,
   }
 })
