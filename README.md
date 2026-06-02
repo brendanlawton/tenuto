@@ -67,6 +67,13 @@ Terminal 2: `pnpm -F web dev` from the repo root.
 
 Restart the Vite dev server after changing `web/.env` or `vite.config.ts`.
 
+## Testing
+
+| Project | Command | Notes |
+|---------|---------|-------|
+| API | `cd api && ./vendor/bin/sail artisan test` | Sail must be running — tests connect to the `pgsql` container |
+| Web | `pnpm -F web test` | No server required |
+
 ## Packages
 
 | Package | Purpose |

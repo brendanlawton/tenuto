@@ -71,6 +71,20 @@ SANCTUM_STATEFUL_DOMAINS=localhost:5173,localhost:3000,localhost
 
 With Sail, leave `web/.env` `VITE_API_URL` empty so the Vite dev proxy forwards auth routes to `http://localhost` (avoids cross-origin CSRF cookie issues).
 
+## Testing
+
+Tests require the Sail stack to be running (PHPUnit connects to the `pgsql` container).
+
+```bash
+# Run all tests
+./vendor/bin/sail artisan test
+
+# Run a single file
+./vendor/bin/sail artisan test tests/Feature/EmailVerificationTest.php
+```
+
+Do not use `php artisan test` directly — it can't resolve the `pgsql` hostname outside Docker.
+
 ## API versioning
 
 All application routes live under `/api/v1/`. Fortify and Sanctum routes are unversioned — they are framework-managed and not subject to application versioning.

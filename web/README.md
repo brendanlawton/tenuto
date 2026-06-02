@@ -59,6 +59,18 @@ src/
 3. **Protected routes** — `requiresAuth` redirects unauthenticated users to `/login`; `requiresVerification` redirects unverified users to `/verify-email`.
 4. **Guest-only routes** — redirect authenticated users to `/dashboard`.
 
+## Testing
+
+```bash
+pnpm -F web test
+```
+
+Or in watch mode during development:
+
+```bash
+pnpm -F web test:watch
+```
+
 ## Type checking
 
 ```bash
