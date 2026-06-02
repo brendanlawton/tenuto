@@ -17,6 +17,8 @@ The Web App calls `GET /sanctum/csrf-cookie` on load, then authenticates via `PO
 
 Mobile Apps call `POST /login` (or a dedicated token endpoint) to receive a Sanctum personal access token, store it securely on-device (Keychain / Keystore), and send it as `Authorization: Bearer {token}` on every request.
 
+Social Login is an alternative entry point into the same downstream paths — the Web App uses a browser redirect flow that terminates in a Sanctum session cookie; Mobile Apps use a token exchange flow that terminates in a Sanctum bearer token. See ADR-0003 (social identity model) and ADR-0004 (mobile token exchange design).
+
 ## Consequences
 - The API must handle both authentication guards simultaneously (`sanctum` middleware works for both).
 - CORS must be configured to allow `app.tenuto.com` with `supports_credentials = true`.

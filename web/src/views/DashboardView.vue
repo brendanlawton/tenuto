@@ -2,9 +2,10 @@
   <div class="min-h-screen bg-gray-50">
     <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
       <span class="font-semibold text-gray-900">Tenuto</span>
-      <button class="text-sm text-gray-600 hover:text-gray-900" @click="handleLogout">
-        Sign out
-      </button>
+      <div class="flex items-center gap-4">
+        <RouterLink to="/settings" class="text-sm text-gray-600 hover:text-gray-900">Settings</RouterLink>
+        <button class="text-sm text-gray-600 hover:text-gray-900" @click="handleLogout">Sign out</button>
+      </div>
     </header>
 
     <main class="max-w-4xl mx-auto p-8">
@@ -17,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()

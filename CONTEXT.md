@@ -38,3 +38,21 @@ The longitudinal record of a user's Playability Assessment results across sessio
 
 ### Token Authentication
 Bearer-token authentication used by the Mobile Apps. Tokens are issued by the API via Sanctum's token API and stored securely on-device.
+
+### Social Login
+Authentication via a third-party OAuth provider (Google, Apple, Facebook) instead of email + password. Supported on all platforms. Produces a single Tenuto account regardless of which platform the user first authenticated on.
+
+### Social Identity
+A record linking a Tenuto `User` to a specific OAuth provider account. Stored in the `social_identities` table as a `(user_id, provider, provider_user_id)` tuple. One user may have multiple Social Identities (e.g., both Google and Apple linked).
+
+### Identity Linking
+The act of associating a Social Identity with an existing Tenuto account. Happens automatically (silently) when a social login returns an email that matches an existing account. Also available explicitly from account settings.
+
+### Token Exchange
+The mobile-specific social login flow. The Mobile App authenticates with the provider natively (using the provider's SDK), receives an ID token, and sends it to `POST /api/v1/auth/{provider}/token`. The API validates the token with the provider and returns a Sanctum bearer token. Contrast with the Web redirect flow.
+
+### Password Enrollment
+The act of adding an email/password login method to an account that was created via Social Login only. Available from Account Settings when the user has no password set (`has_password = false`). Does not remove or replace existing Social Identities — the user can continue to log in via both methods after enrollment.
+
+### Account Settings
+The authenticated area of the Web App where users manage their account. Initially contains Password Enrollment. Future sections: change password, linked providers, profile.

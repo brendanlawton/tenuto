@@ -28,6 +28,7 @@ export default defineConfig({
       '/reset-password': { target: apiProxyTarget, changeOrigin: true },
       '/email': { target: apiProxyTarget, changeOrigin: true },
       '/api': { target: apiProxyTarget, changeOrigin: true },
+      '/auth': { target: apiProxyTarget, changeOrigin: true },
     },
   },
 })

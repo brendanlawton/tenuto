@@ -59,6 +59,24 @@
         </button>
       </form>
 
+      <div class="relative">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-gray-200" />
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="bg-white px-2 text-gray-500">Or continue with</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <a
+          href="/auth/google/redirect"
+          class="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+        >
+          Continue with Google
+        </a>
+      </div>
+
       <p class="text-sm text-center text-gray-600">
         Already have an account?
         <RouterLink to="/login" class="hover:text-gray-900">Sign in</RouterLink>
@@ -86,7 +104,12 @@ async function submit() {
     await auth.register(form.value)
     router.push({ name: 'verify-email' })
   } catch (e: any) {
-    error.value = e.response?.data?.message ?? 'Registration failed.'
+    const emailError = e.response?.data?.errors?.email?.[0]
+    if (emailError?.includes('already been taken')) {
+      error.value = 'An account with this email already exists. Sign in instead.'
+    } else {
+      error.value = e.response?.data?.message ?? 'Registration failed.'
+    }
   } finally {
     loading.value = false
   }

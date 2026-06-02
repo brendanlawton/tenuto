@@ -7,6 +7,7 @@ export interface User {
   name: string
   email: string
   email_verified_at: string | null
+  has_password: boolean
 }
 
 export const useAuthStore = defineStore('auth', () => {
@@ -73,6 +74,11 @@ export const useAuthStore = defineStore('auth', () => {
     await fetchUser()
   }
 
+  async function enrollPassword(payload: { password: string; password_confirmation: string }) {
+    await api.post('/api/v1/user/password', payload)
+    await fetchUser()
+  }
+
   return {
     user,
     initialized,
@@ -86,5 +92,6 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
     resendVerificationEmail,
     verifyEmail,
+    enrollPassword,
   }
 })
