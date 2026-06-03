@@ -8,13 +8,10 @@ A cross-platform piano practice app. Connect a MIDI piano, work through practice
 tenuto/
 ├── api/          Laravel 13 — REST API, authentication, persistence
 ├── web/          Vue 3 SPA — web client
-├── core/         Shared C++ — playability assessment logic (WASM + native)
-└── mobile/
-    ├── ios/      Swift / Xcode
-    └── android/  Kotlin / Android Studio
+├── ios/          Swift / Xcode — iOS app
+├── android/      Kotlin / Android Studio — Android app (planned)
+└── core/         Shared C++ — playability assessment logic (planned)
 ```
-
-> `core/` and `mobile/` are not yet scaffolded.
 
 ## Architecture
 
@@ -66,6 +63,12 @@ Terminal 1: `cd api && ./vendor/bin/sail up`
 Terminal 2: `pnpm -F web dev` from the repo root.
 
 Restart the Vite dev server after changing `web/.env` or `vite.config.ts`.
+
+### 3. iOS
+
+Open `ios/ios.xcodeproj` in Xcode and run on a simulator or device. Sail must be running — the debug build points to `http://localhost:80/api/v1`.
+
+See [`ios/README.md`](ios/README.md) for full setup including Google Sign-In credentials.
 
 ## Testing
 

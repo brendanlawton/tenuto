@@ -8,7 +8,7 @@ This is a monorepo. All platform clients and the shared core library live here.
 |------------|-----------------------|-------------|---------|
 | `api/`     | Laravel API           | PHP 8.5     | Active  |
 | `web/`     | Vue 3 SPA             | TypeScript  | Active  |
-| `ios/`     | iOS app               | Swift       | Planned |
+| `ios/`     | iOS app               | Swift       | Active  |
 | `android/` | Android app           | Kotlin      | Planned |
 | `core/`    | Playability assessment core | C++   | Planned |
 

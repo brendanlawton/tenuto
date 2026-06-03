@@ -11,18 +11,28 @@ Laravel 13 REST API powering the Tenuto piano practice platform.
 
 ## Auth endpoints
 
-These are registered by Fortify/Sanctum — no custom controllers needed.
+### Web (Fortify/Sanctum — cookie-based sessions)
 
 | Method | Path | Description |
 |--------|------|-------------|
 | `GET` | `/sanctum/csrf-cookie` | Initialise CSRF cookie (SPA must call before any POST) |
-| `POST` | `/login` | Authenticate — returns session cookie or bearer token |
-| `POST` | `/logout` | End session / revoke token |
+| `POST` | `/login` | Authenticate — returns session cookie |
+| `POST` | `/logout` | End session |
 | `POST` | `/register` | Create account |
 | `POST` | `/forgot-password` | Send password reset email |
 | `POST` | `/reset-password` | Set new password via reset token |
 | `POST` | `/email/verification-notification` | Resend verification email |
-| `GET` | `/api/v1/user` | Authenticated user — requires `auth:sanctum` |
+| `GET` | `/auth/{provider}/redirect` | Begin social OAuth redirect flow |
+| `GET` | `/auth/{provider}/callback` | Social OAuth callback — sets session cookie |
+
+### Mobile (bearer tokens — all under `/api/v1/`)
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/api/v1/auth/register` | Create account — sends verification email |
+| `POST` | `/api/v1/auth/token` | Password login — returns `{ token }` |
+| `POST` | `/api/v1/auth/{provider}/token` | Social login via ID token exchange — returns `{ token }` |
+| `GET` | `/api/v1/user` | Authenticated user — requires `Authorization: Bearer {token}` |
 
 ## Local setup (Sail)
 
