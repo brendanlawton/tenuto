@@ -7,6 +7,7 @@ struct LoginView: View {
     @State private var password = ""
     @State private var errorMessage: String?
     @State private var isLoading = false
+    @State private var showRegister = false
 
     var body: some View {
         VStack(spacing: 24) {
@@ -44,8 +45,17 @@ struct LoginView: View {
             }
             .buttonStyle(.borderedProminent)
             .disabled(isLoading || email.isEmpty || password.isEmpty)
+
+            Button("Don't have an account? Register") {
+                showRegister = true
+            }
+            .font(.caption)
         }
         .padding(32)
+        .sheet(isPresented: $showRegister) {
+            RegisterView()
+                .environment(authState)
+        }
     }
 
     private func login() async {

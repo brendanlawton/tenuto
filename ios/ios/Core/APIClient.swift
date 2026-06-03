@@ -38,6 +38,33 @@ struct APIClient {
         }
     }
 
+    func register(name: String, email: String, password: String, passwordConfirmation: String) async throws {
+        var request = URLRequest(url: Config.apiBaseURL.appendingPathComponent("auth/register"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = try JSONEncoder().encode([
+            "name": name,
+            "email": email,
+            "password": password,
+            "password_confirmation": passwordConfirmation,
+        ])
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+
+        switch http.statusCode {
+        case 201:
+            return
+        case 422:
+            let body = try? JSONDecoder().decode(ValidationErrorResponse.self, from: data)
+            throw APIError.unprocessable(body?.firstMessage ?? "Registration failed.")
+        default:
+            throw APIError.serverError
+        }
+    }
+
     func fetchUser() async throws -> UserResponse {
         guard let token = authState.token else { throw APIError.unauthorized }
 
