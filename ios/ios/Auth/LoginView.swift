@@ -1,3 +1,4 @@
+import GoogleSignIn
 import SwiftUI
 
 struct LoginView: View {
@@ -46,6 +47,24 @@ struct LoginView: View {
             .buttonStyle(.borderedProminent)
             .disabled(isLoading || email.isEmpty || password.isEmpty)
 
+            HStack {
+                VStack { Divider() }
+                Text("or").foregroundStyle(.secondary).font(.caption)
+                VStack { Divider() }
+            }
+
+            Button {
+                Task { await signInWithGoogle() }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "g.circle.fill")
+                    Text("Sign in with Google")
+                }
+                .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+            .disabled(isLoading)
+
             Button("Don't have an account? Register") {
                 showRegister = true
             }
@@ -70,6 +89,43 @@ struct LoginView: View {
             errorMessage = message
         } catch {
             errorMessage = "Something went wrong. Please try again."
+        }
+
+        isLoading = false
+    }
+
+    private func signInWithGoogle() async {
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                  let rootViewController = windowScene.windows.first?.rootViewController
+            else { throw APIError.invalidResponse }
+
+            let result: GIDSignInResult = try await withCheckedThrowingContinuation { continuation in
+                GIDSignIn.sharedInstance.signIn(withPresenting: rootViewController) { signInResult, error in
+                    if let error {
+                        continuation.resume(throwing: error)
+                    } else if let signInResult {
+                        continuation.resume(returning: signInResult)
+                    } else {
+                        continuation.resume(throwing: APIError.invalidResponse)
+                    }
+                }
+            }
+
+            guard let idToken = result.user.idToken?.tokenString else {
+                throw APIError.invalidResponse
+            }
+
+            let client = APIClient(authState: authState)
+            let token = try await client.googleSignIn(idToken: idToken)
+            authState.login(token: token)
+        } catch APIError.unprocessable(let message) {
+            errorMessage = message
+        } catch {
+            errorMessage = "Google sign-in failed. Please try again."
         }
 
         isLoading = false

@@ -65,6 +65,30 @@ struct APIClient {
         }
     }
 
+    func googleSignIn(idToken: String) async throws -> String {
+        var request = URLRequest(url: Config.apiBaseURL.appendingPathComponent("auth/google/token"))
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = try JSONEncoder().encode(["id_token": idToken])
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+
+        guard let http = response as? HTTPURLResponse else { throw APIError.invalidResponse }
+
+        switch http.statusCode {
+        case 200:
+            let body = try JSONDecoder().decode([String: String].self, from: data)
+            guard let token = body["token"] else { throw APIError.invalidResponse }
+            return token
+        case 422:
+            let body = try? JSONDecoder().decode(ValidationErrorResponse.self, from: data)
+            throw APIError.unprocessable(body?.firstMessage ?? "Google sign-in failed.")
+        default:
+            throw APIError.serverError
+        }
+    }
+
     func fetchUser() async throws -> UserResponse {
         guard let token = authState.token else { throw APIError.unauthorized }
 
