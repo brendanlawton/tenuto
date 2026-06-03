@@ -9,7 +9,7 @@ tenuto/
 ├── api/          Laravel 13 — REST API, authentication, persistence
 ├── web/          Vue 3 SPA — web client
 ├── ios/          Swift / Xcode — iOS app
-├── android/      Kotlin / Android Studio — Android app (planned)
+├── android/      Kotlin / Android Studio — Android app
 └── core/         Shared C++ — playability assessment logic (planned)
 ```
 
@@ -70,12 +70,19 @@ Open `ios/ios.xcodeproj` in Xcode and run on a simulator or device. Sail must be
 
 See [`ios/README.md`](ios/README.md) for full setup including Google Sign-In credentials.
 
+### 4. Android
+
+Open `android/` in Android Studio and run on an emulator or device. Sail must be running — the debug build points to `http://10.0.2.2/api/v1` (the emulator's alias for the host machine's localhost).
+
+See [`android/README.md`](android/README.md) for full setup details.
+
 ## Testing
 
 | Project | Command | Notes |
 |---------|---------|-------|
 | API | `cd api && ./vendor/bin/sail artisan test` | Sail must be running — tests connect to the `pgsql` container |
 | Web | `pnpm -F web test` | No server required |
+| Android | Run via Android Studio (▶) | Emulator or physical device |
 
 ## Packages
 
