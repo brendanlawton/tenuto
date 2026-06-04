@@ -2,9 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\SocialIdentity;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Facades\Socialite;
 use Mockery;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ class SocialAuthTest extends TestCase
         $socialiteUser->shouldReceive('getEmail')->andReturn($email);
         $socialiteUser->shouldReceive('getName')->andReturn($name);
 
-        $provider = Mockery::mock(\Laravel\Socialite\Contracts\Provider::class);
+        $provider = Mockery::mock(Provider::class);
         $provider->shouldReceive('user')->andReturn($socialiteUser);
 
         Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
@@ -91,5 +91,34 @@ class SocialAuthTest extends TestCase
             'provider' => 'google',
             'provider_user_id' => 'google-123',
         ]);
+    }
+
+    public function test_callback_authenticates_user_in_session(): void
+    {
+        $this->mockSocialiteUser('google-123', 'new@example.com', 'New User');
+
+        $this->get('/auth/google/callback');
+
+        $this->assertAuthenticated();
+    }
+
+    public function test_callback_auto_link_preserves_existing_password(): void
+    {
+        $existingUser = User::factory()->create(['email' => 'existing@example.com']);
+        $originalPassword = $existingUser->getAttributes()['password'];
+        $this->mockSocialiteUser('google-456', 'existing@example.com', 'Existing User');
+
+        $this->get('/auth/google/callback');
+
+        $this->assertSame($originalPassword, $existingUser->fresh()->getAttributes()['password']);
+    }
+
+    public function test_callback_does_not_authenticate_user_when_oauth_fails(): void
+    {
+        Socialite::shouldReceive('driver->user')->andThrow(new \Exception('OAuth failed'));
+
+        $this->get('/auth/google/callback');
+
+        $this->assertGuest();
     }
 }
