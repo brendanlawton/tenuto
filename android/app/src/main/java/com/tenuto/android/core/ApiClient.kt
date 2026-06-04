@@ -24,6 +24,9 @@ private data class RegisterRequest(
 )
 
 @Serializable
+private data class GoogleSignInRequest(val id_token: String)
+
+@Serializable
 data class TokenResponse(val token: String)
 
 @Serializable
@@ -47,6 +50,9 @@ private interface AuthService {
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<Unit>
+
+    @POST("auth/google/token")
+    suspend fun googleSignIn(@Body request: GoogleSignInRequest): Response<TokenResponse>
 
     @GET("user")
     suspend fun fetchUser(@Header("Authorization") auth: String): Response<UserResponse>
@@ -78,6 +84,15 @@ class ApiClient {
         when (response.code()) {
             201 -> return
             422 -> throw ApiError.Unprocessable(parseValidationError(response.errorBody()?.string()) ?: "Registration failed.")
+            else -> throw ApiError.ServerError
+        }
+    }
+
+    suspend fun googleSignIn(idToken: String): String {
+        val response = service.googleSignIn(GoogleSignInRequest(idToken))
+        return when (response.code()) {
+            200 -> response.body()?.token ?: throw ApiError.InvalidResponse
+            422 -> throw ApiError.Unprocessable(parseValidationError(response.errorBody()?.string()) ?: "Google sign-in failed.")
             else -> throw ApiError.ServerError
         }
     }

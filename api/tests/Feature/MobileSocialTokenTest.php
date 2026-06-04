@@ -67,6 +67,23 @@ class MobileSocialTokenTest extends TestCase
         ]);
     }
 
+    public function test_valid_android_google_token_returns_bearer_token(): void
+    {
+        Http::fake([
+            'oauth2.googleapis.com/tokeninfo*' => Http::response([
+                'sub' => 'google-123',
+                'email' => 'new@example.com',
+                'name' => 'New User',
+                'aud' => config('services.google.client_id'),
+                'email_verified' => 'true',
+            ], 200),
+        ]);
+
+        $this->postJson('/api/v1/auth/google/token', ['id_token' => 'valid-id-token'])
+            ->assertOk()
+            ->assertJsonStructure(['token']);
+    }
+
     public function test_invalid_google_token_returns_422(): void
     {
         Http::fake([

@@ -20,7 +20,12 @@ class MobileSocialTokenController extends Controller
             'id_token' => $request->id_token,
         ]);
 
-        if ($tokenInfo->failed() || $tokenInfo->json('aud') !== config('services.google.ios_client_id')) {
+        $validAudiences = [
+            config('services.google.ios_client_id'),
+            config('services.google.client_id'),
+        ];
+
+        if ($tokenInfo->failed() || ! in_array($tokenInfo->json('aud'), $validAudiences)) {
             throw ValidationException::withMessages([
                 'id_token' => ['The provided token is invalid.'],
             ]);
